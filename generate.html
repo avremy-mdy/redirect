@@ -189,7 +189,7 @@
                 <div class="form-group">
                     <label for="destinationUrl">Destination URL *</label>
                     <input type="url" id="destinationUrl" name="destinationUrl" required 
-                           placeholder="https://chat.whatsapp.com/FFBUGPkIuMLHHtz7668qkv">
+                           placeholder="https://chat.whatsapp.com/FFBUGPkIuMLHHtz7668qkv" value="https://chat.whatsapp.com/FFBUGPkIuMLHHtz7668qkv">
                     <div class="description">
                         The final URL where users will be redirected. Must be a valid, complete URL.
                     </div>
@@ -198,7 +198,7 @@
                 <div class="form-group">
                     <label for="utmSource">UTM Source</label>
                     <input type="text" id="utmSource" name="utmSource" 
-                           placeholder="whatsapp, facebook, google, newsletter">
+                           placeholder="whatsapp, facebook, google, newsletter" value="whatsapp">
                     <div class="description">
                         Identify the source of your traffic (e.g., social media platform, search engine, email campaign).
                     </div>
@@ -207,7 +207,7 @@
                 <div class="form-group">
                     <label for="utmMedium">UTM Medium</label>
                     <input type="text" id="utmMedium" name="utmMedium" 
-                           placeholder="cpc, social, email, banner">
+                           placeholder="cpc, social, email, banner" value="social">
                     <div class="description">
                         Marketing medium (e.g., cost-per-click, social media, email newsletter).
                     </div>
@@ -270,55 +270,59 @@
     </div>
 
     <script>
-        function generateUrl() {
-            const baseUrl = window.location.origin + window.location.pathname;
-            const destinationUrl = document.getElementById('destinationUrl').value;
-            
-            if (!destinationUrl) {
-                alert('Please enter a destination URL');
-                return;
-            }
+function generateUrl() {
+    const baseUrl = window.location.origin;
+    const destinationUrl = document.getElementById('destinationUrl').value;
 
-            // Collect all parameters
-            const params = new URLSearchParams();
-            
-            // Add encoded destination URL
-            params.append('redirect_url', encodeURIComponent(destinationUrl));
+    if (!destinationUrl) {
+        alert('Please enter a destination URL');
+        return;
+    }
 
-            // Add UTM and other tracking parameters
-            const trackingParams = [
-                'utmSource', 'utmMedium', 'utmCampaign', 'utmTerm', 'utmContent', 'gclid'
-            ];
+    // Collect all parameters
+    const params = new URLSearchParams();
+    
+    // Add encoded destination URL
+    params.append('redirect_url', encodeURIComponent(destinationUrl));
 
-            trackingParams.forEach(param => {
-                const element = document.getElementById(param.toLowerCase());
-                const value = element.value.trim();
-                if (value) {
-                    const queryParamName = param === 'utmSource' ? 'utm_source' :
-                                           param === 'utmMedium' ? 'utm_medium' :
-                                           param === 'utmCampaign' ? 'utm_campaign' :
-                                           param === 'utmTerm' ? 'utm_term' :
-                                           param === 'utmContent' ? 'utm_content' :
-                                           param;
-                    params.append(queryParamName, value);
-                }
-            });
+    // Add UTM and other tracking parameters
+    const trackingParams = [
+        'utmSource', 'utmMedium', 'utmCampaign', 'utmTerm', 'utmContent', 'gclid'
+    ];
 
-            // Generate full URL
-            const fullUrl = `${baseUrl}?${params.toString()}`;
-
-            // Display URL
-            const generatedUrlEl = document.getElementById('generatedUrl');
-            generatedUrlEl.textContent = fullUrl;
-
-            // Show action buttons
-            const actionButtons = document.getElementById('actionButtons');
-            actionButtons.style.display = 'flex';
-
-            // Update follow link
-            const followLink = document.getElementById('followLink');
-            followLink.href = fullUrl;
+    trackingParams.forEach(param => {
+        const element = document.getElementById(param); // Use param directly, no toLowerCase()
+        if (!element) {
+            console.warn(`Element with id "${param}" not found.`);
+            return; // Skip if element is not found
         }
+        const value = element.value.trim();
+        if (value) {
+            const queryParamName = param === 'utmSource' ? 'utm_source' :
+                                   param === 'utmMedium' ? 'utm_medium' :
+                                   param === 'utmCampaign' ? 'utm_campaign' :
+                                   param === 'utmTerm' ? 'utm_term' :
+                                   param === 'utmContent' ? 'utm_content' :
+                                   param;
+            params.append(queryParamName, value);
+        }
+    });
+
+    // Generate full URL
+    const fullUrl = `${baseUrl}?${params.toString()}`;
+
+    // Display URL
+    const generatedUrlEl = document.getElementById('generatedUrl');
+    generatedUrlEl.textContent = fullUrl;
+
+    // Show action buttons
+    const actionButtons = document.getElementById('actionButtons');
+    actionButtons.style.display = 'flex';
+
+    // Update follow link
+    const followLink = document.getElementById('followLink');
+    followLink.href = fullUrl;
+}
 
         function copyToClipboard() {
             const urlToCopy = document.getElementById('generatedUrl').textContent;
