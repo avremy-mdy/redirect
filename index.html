@@ -1,41 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Group Redirect</title>
+    <title>MDY Redirect...</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <link rel="icon"
+        href="https://cdn.prod.website-files.com/638d1e939a16180ba7bca49d/63a06bd829e4ac63dd2358ed_MDYIcon.png"
+        type="image/png">
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-385TF6VQ85"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-385TF6VQ85"></script>
 
-
-
-
-
-
-<script>        
-
-
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-385TF6VQ85');
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-385TF6VQ85');
 
 
-        // Parse URL parameters
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        // Tracking and Redirect Function
+        // Tracking and Redirect Function with Marketing Parameters
         function trackAndRedirect() {
+            // Standard marketing parameters to collect
+            const marketingParams = [
+                'utm_source',
+                'utm_medium',
+                'utm_campaign',
+                'utm_term',
+                'utm_content'
+            ];
+
             // Collect key parameters
             const params = {
                 'redirect_url': getQueryParam('redirect_url'),
-                'source': getQueryParam('source') || 'unknown'
+                'referrer': document.referrer || 'direct'
             };
+
+            // Collect UTM and additional marketing parameters
+            marketingParams.forEach(param => {
+                const value = getQueryParam(param);
+                if (value) {
+                    params[param] = value;
+                }
+            });
+
+            // Additional optional parameters
+            params['gclid'] = getQueryParam('gclid'); // Google Click Identifier
+            params['fbclid'] = getQueryParam('fbclid'); // Facebook Click Identifier
 
             // Validate redirect URL
             if (!params.redirect_url) {
@@ -43,17 +54,34 @@
                 return;
             }
 
-            // Track the redirect event
-            gtag('event', 'redirect', {
+            // Construct tracking event payload
+            const trackingPayload = {
                 'event_category': 'Group Redirect',
-                'event_label': params.source,
-                'transport_type': 'beacon'
-            });
+                'event_label': params.utm_source || 'unknown',
+                'transport_type': 'beacon',
+                ...Object.fromEntries(
+                    Object.entries(params)
+                        .filter(([key]) =>
+                            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].includes(key)
+                        )
+                )
+            };
+
+            // Track the redirect event
+            gtag('event', 'redirect', trackingPayload);
+
+            // Construct redirect URL with marketing parameters
+            const redirectUrl = new URL(decodeURIComponent(params.redirect_url));
+            Object.entries(params)
+                .filter(([key]) => marketingParams.includes(key) || ['gclid', 'fbclid'].includes(key))
+                .forEach(([key, value]) => {
+                    redirectUrl.searchParams.set(key, value);
+                });
 
             // Redirect after a short delay to ensure tracking
             setTimeout(() => {
                 try {
-                    window.location.href = decodeURIComponent(params.redirect_url);
+                    window.location.href = redirectUrl.toString();
                 } catch (error) {
                     console.error('Redirect failed:', error);
                     alert('Failed to redirect. Please check the URL.');
@@ -61,6 +89,12 @@
             }, 200);
         }
 
+        // Utility function to safely get query parameters
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name)?.trim() || null;
+        }
+        
         // Run tracking when page loads
         window.addEventListener('load', trackAndRedirect);
     </script>
@@ -74,20 +108,23 @@
             margin: 0;
             background-color: #f0f2f5;
         }
+
         .loading-container {
             text-align: center;
             padding: 20px;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             max-width: 400px;
         }
     </style>
 </head>
+
 <body>
     <div class="loading-container">
         <h1>Redirecting...</h1>
         <p>Please wait while we process your request.</p>
     </div>
 </body>
+
 </html>
