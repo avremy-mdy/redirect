@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDY Redirect URL Builder</title>
+    <link rel="icon" href="https://cdn.prod.website-files.com/638d1e939a16180ba7bca49d/63a06bd829e4ac63dd2358ed_MDYIcon.png" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f4f7f9;
+            --card-background: white;
+            --text-color: #333;
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #007bff 0%, #00d4ff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-placeholder i {
+            color: white;
+            font-size: 40px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .description {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        #generatedUrl {
+            background-color: #f8f9fa;
+            border: 1px dashed var(--primary-color);
+            padding: 15px;
+            border-radius: 4px;
+            word-break: break-all;
+            margin-top: 20px;
+            font-family: monospace;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn i {
+            margin-right: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .button-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-placeholder">
+                <i class="fas fa-link"></i>
+            </div>
+            <h1>MDY Redirect URL Builder</h1>
+        </div>
+
+        <div class="card">
+            <form id="redirectForm">
+                <div class="form-group">
+                    <label for="destinationUrl">Destination URL *</label>
+                    <input type="url" id="destinationUrl" name="destinationUrl" required 
+                           placeholder="https://chat.whatsapp.com/FFBUGPkIuMLHHtz7668qkv">
+                    <div class="description">
+                        The final URL where users will be redirected. Must be a valid, complete URL.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="utmSource">UTM Source</label>
+                    <input type="text" id="utmSource" name="utmSource" 
+                           placeholder="whatsapp, facebook, google, newsletter">
+                    <div class="description">
+                        Identify the source of your traffic (e.g., social media platform, search engine, email campaign).
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="utmMedium">UTM Medium</label>
+                    <input type="text" id="utmMedium" name="utmMedium" 
+                           placeholder="cpc, social, email, banner">
+                    <div class="description">
+                        Marketing medium (e.g., cost-per-click, social media, email newsletter).
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="utmCampaign">UTM Campaign</label>
+                    <input type="text" id="utmCampaign" name="utmCampaign" 
+                           placeholder="sanhedrin_2024, shabbaton, member_referral">
+                    <div class="description">
+                        Specific marketing campaign name for tracking performance.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="utmTerm">UTM Term</label>
+                    <input type="text" id="utmTerm" name="utmTerm" 
+                           placeholder="daf+yomi, daily+talmud">
+                    <div class="description">
+                        Paid search keyword. Useful for tracking specific search terms in ads.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="utmContent">UTM Content</label>
+                    <input type="text" id="utmContent" name="utmContent" 
+                           placeholder="member_eli_stafansky, textlink, imagelink, headerad">
+                    <div class="description">
+                        Differentiate links within the same ad or email (e.g., different member referrer or ad variations).
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="gclid">Google Click Identifier (gclid)</label>
+                    <input type="text" id="gclid" name="gclid" 
+                           placeholder="CjwKCAjw...">
+                    <div class="description">
+                        Unique tracking parameter for Google Ads campaigns.
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" onclick="generateUrl()" class="btn btn-primary">
+                        <i class="fas fa-link"></i> Generate Redirect URL
+                    </button>
+                </div>
+
+                <div id="generatedUrl"></div>
+
+                <div class="button-group" id="actionButtons" style="display: none;">
+                    <a href="#" id="followLink" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Follow Link
+                    </a>
+                    <button type="button" onclick="copyToClipboard()" class="btn btn-secondary">
+                        <i class="fas fa-copy"></i> Copy URL
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function generateUrl() {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const destinationUrl = document.getElementById('destinationUrl').value;
+            
+            if (!destinationUrl) {
+                alert('Please enter a destination URL');
+                return;
+            }
+
+            // Collect all parameters
+            const params = new URLSearchParams();
+            
+            // Add encoded destination URL
+            params.append('redirect_url', encodeURIComponent(destinationUrl));
+
+            // Add UTM and other tracking parameters
+            const trackingParams = [
+                'utmSource', 'utmMedium', 'utmCampaign', 'utmTerm', 'utmContent', 'gclid'
+            ];
+
+            trackingParams.forEach(param => {
+                const element = document.getElementById(param.toLowerCase());
+                const value = element.value.trim();
+                if (value) {
+                    const queryParamName = param === 'utmSource' ? 'utm_source' :
+                                           param === 'utmMedium' ? 'utm_medium' :
+                                           param === 'utmCampaign' ? 'utm_campaign' :
+                                           param === 'utmTerm' ? 'utm_term' :
+                                           param === 'utmContent' ? 'utm_content' :
+                                           param;
+                    params.append(queryParamName, value);
+                }
+            });
+
+            // Generate full URL
+            const fullUrl = `${baseUrl}?${params.toString()}`;
+
+            // Display URL
+            const generatedUrlEl = document.getElementById('generatedUrl');
+            generatedUrlEl.textContent = fullUrl;
+
+            // Show action buttons
+            const actionButtons = document.getElementById('actionButtons');
+            actionButtons.style.display = 'flex';
+
+            // Update follow link
+            const followLink = document.getElementById('followLink');
+            followLink.href = fullUrl;
+        }
+
+        function copyToClipboard() {
+            const urlToCopy = document.getElementById('generatedUrl').textContent;
+            navigator.clipboard.writeText(urlToCopy).then(() => {
+                alert('URL copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy URL');
+            });
+        }
+    </script>
+</body>
+</html>
