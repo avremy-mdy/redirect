@@ -18,25 +18,14 @@
         gtag('js', new Date());
         gtag('config', 'G-385TF6VQ85');
 
+        async function trackAndRedirect() {
+            const marketingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
 
-        // Tracking and Redirect Function with Marketing Parameters
-        function trackAndRedirect() {
-            // Standard marketing parameters to collect
-            const marketingParams = [
-                'utm_source',
-                'utm_medium',
-                'utm_campaign',
-                'utm_term',
-                'utm_content'
-            ];
-
-            // Collect key parameters
             const params = {
-                'redirect_url': getQueryParam('redirect_url'),
+                'redirect_key': getQueryParam('redirect_key'),
                 'referrer': document.referrer || 'direct'
             };
 
-            // Collect UTM and additional marketing parameters
             marketingParams.forEach(param => {
                 const value = getQueryParam(param);
                 if (value) {
@@ -44,58 +33,57 @@
                 }
             });
 
-            // Additional optional parameters
-            params['gclid'] = getQueryParam('gclid'); // Google Click Identifier
-            params['fbclid'] = getQueryParam('fbclid'); // Facebook Click Identifier
+            params['gclid'] = getQueryParam('gclid');
+            params['fbclid'] = getQueryParam('fbclid');
 
-            // Validate redirect URL
-            if (!params.redirect_url) {
-                alert('Error: No destination URL specified');
+            if (!params.redirect_key) {
+                alert('Error: No destination key specified');
                 return;
             }
 
-            // Construct tracking event payload
-            const trackingPayload = {
-                'event_category': 'Group Redirect',
-                'event_label': params.utm_source || 'unknown',
-                'transport_type': 'beacon',
-                ...Object.fromEntries(
-                    Object.entries(params)
-                        .filter(([key]) =>
-                            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].includes(key)
-                        )
-                )
-            };
+            try {
+                const response = await fetch('redirects.json');
+                const redirects = await response.json();
+                const redirectUrl = redirects[params.redirect_key];
 
-            // Track the redirect event
-            gtag('event', 'redirect', trackingPayload);
+                if (!redirectUrl) {
+                    alert('Error: Invalid redirect key');
+                    return;
+                }
 
-            // Construct redirect URL with marketing parameters
-            const redirectUrl = new URL(decodeURIComponent(params.redirect_url));
-            Object.entries(params)
-                .filter(([key]) => marketingParams.includes(key) || ['gclid', 'fbclid'].includes(key))
-                .forEach(([key, value]) => {
-                    redirectUrl.searchParams.set(key, value);
+                const finalUrl = new URL(redirectUrl);
+                Object.entries(params)
+                    .filter(([key]) => marketingParams.includes(key) || ['gclid', 'fbclid'].includes(key))
+                    .forEach(([key, value]) => {
+                        finalUrl.searchParams.set(key, value);
+                    });
+
+                gtag('event', 'redirect', {
+                    'event_category': 'Group Redirect',
+                    'event_label': params.utm_source || 'unknown',
+                    'transport_type': 'beacon',
+                    ...Object.fromEntries(
+                        Object.entries(params)
+                            .filter(([key]) =>
+                                ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].includes(key)
+                            )
+                    )
                 });
 
-            // Redirect after a short delay to ensure tracking
-            setTimeout(() => {
-                try {
-                    window.location.href = redirectUrl.toString();
-                } catch (error) {
-                    console.error('Redirect failed:', error);
-                    alert('Failed to redirect. Please check the URL.');
-                }
-            }, 200);
+                setTimeout(() => {
+                    window.location.href = finalUrl.toString();
+                }, 200);
+            } catch (error) {
+                console.error('Redirect failed:', error);
+                alert('Failed to redirect. Please try again.');
+            }
         }
 
-        // Utility function to safely get query parameters
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name)?.trim() || null;
         }
-        
-        // Run tracking when page loads
+
         window.addEventListener('load', trackAndRedirect);
     </script>
     <style>
