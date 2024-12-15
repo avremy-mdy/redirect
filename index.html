@@ -72,20 +72,20 @@
                 const finalUrl = redirectConfig.destination;
 
                 // Track the redirect event with all parameters
-                gtag('event', 'redirect', {
-                    'event_category': 'Group Redirect',
-                    'event_label': params.utm_source || 'unknown',
-                    'transport_type': 'beacon',
-                    'redirect_key': redirectKey,
-                    'redirect_content': redirectContent,
-                    ...redirectConfig.params,
-                    ...Object.fromEntries(
-                        Object.entries(params)
-                            .filter(([key]) =>
-                                ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].includes(key)
-                            )
-                    )
-                });
+                // gtag('event', 'redirect', {
+                //     'event_category': 'Group Redirect',
+                //     'event_label': params.utm_source || 'unknown',
+                //     'transport_type': 'beacon',
+                //     'redirect_key': redirectKey,
+                //     'redirect_content': redirectContent,
+                //     ...redirectConfig.params,
+                //     ...Object.fromEntries(
+                //         Object.entries(params)
+                //             .filter(([key]) =>
+                //                 ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].includes(key)
+                //             )
+                //     )
+                // });
 
                 // Redirect after a short delay to ensure tracking is sent
                 setTimeout(() => {
