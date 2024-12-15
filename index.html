@@ -19,13 +19,20 @@
         gtag('config', 'G-385TF6VQ85');
 
         async function trackAndRedirect() {
-            const marketingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+            const marketingParams = [
+                'utm_source', 
+                'utm_medium', 
+                'utm_campaign', 
+                'utm_term', 
+                'utm_content'
+            ];
 
             const params = {
                 'redirect_key': getQueryParam('redirect_key'),
                 'referrer': document.referrer || 'direct'
             };
 
+            // Add tracking parameters to params
             marketingParams.forEach(param => {
                 const value = getQueryParam(param);
                 if (value) {
@@ -33,6 +40,7 @@
                 }
             });
 
+            // Handle Google and Facebook click IDs
             params['gclid'] = getQueryParam('gclid');
             params['fbclid'] = getQueryParam('fbclid');
 
@@ -44,20 +52,36 @@
             try {
                 const response = await fetch('redirects.json');
                 const redirects = await response.json();
-                const redirectUrl = redirects[params.redirect_key];
+                
+                // Find the redirect configuration for this key
+                const redirectConfig = redirects[params.redirect_key];
 
-                if (!redirectUrl) {
+                if (!redirectConfig) {
                     alert('Error: Invalid redirect key');
                     return;
                 }
 
-                const finalUrl = new URL(redirectUrl);
+                // Use the destination URL from the config
+                const finalUrl = new URL(redirectConfig.destination);
+
+                // Add predefined parameters from the config
+                if (redirectConfig.params) {
+                    Object.entries(redirectConfig.params).forEach(([key, value]) => {
+                        finalUrl.searchParams.set(key, value);
+                    });
+                }
+
+                // Add tracking parameters to the URL
                 Object.entries(params)
-                    .filter(([key]) => marketingParams.includes(key) || ['gclid', 'fbclid'].includes(key))
+                    .filter(([key]) => 
+                        marketingParams.includes(key) || 
+                        ['gclid', 'fbclid'].includes(key)
+                    )
                     .forEach(([key, value]) => {
                         finalUrl.searchParams.set(key, value);
                     });
 
+                // Track the redirect event
                 gtag('event', 'redirect', {
                     'event_category': 'Group Redirect',
                     'event_label': params.utm_source || 'unknown',
@@ -70,6 +94,7 @@
                     )
                 });
 
+                // Redirect after a short delay
                 setTimeout(() => {
                     window.location.href = finalUrl.toString();
                 }, 200);
