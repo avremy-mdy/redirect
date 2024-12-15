@@ -6,113 +6,104 @@
     <title>MDY Redirect...</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon"
-        href="https://cdn.prod.website-files.com/638d1e939a16180ba7bca49d/63a06bd829e4ac63dd2358ed_MDYIcon.png"
-        type="image/png">
+          href="https://cdn.prod.website-files.com/638d1e939a16180ba7bca49d/63a06bd829e4ac63dd2358ed_MDYIcon.png"
+          type="image/png">
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-385TF6VQ85"></script>
 
-  <script>
-    async function trackAndRedirect() {
-        const marketingParams = [
-            'utm_source', 
-            'utm_medium', 
-            'utm_campaign', 
-            'utm_term', 
-            'utm_content'
-        ];
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-        const params = {
-            'redirect_key': getQueryParam('redirect_key'),
-            'referrer': document.referrer || 'direct'
-        };
+        gtag('config', 'G-385TF6VQ85');
+    </script>
 
-        // Add tracking parameters to params
-        marketingParams.forEach(param => {
-            const value = getQueryParam(param);
-            if (value) {
-                params[param] = value;
-            }
-        });
+    <script>
+        async function trackAndRedirect() {
+            const marketingParams = [
+                'utm_source',
+                'utm_medium',
+                'utm_campaign',
+                'utm_term',
+                'utm_content'
+            ];
 
-        // Handle Google and Facebook click IDs
-        params['gclid'] = getQueryParam('gclid');
-        params['fbclid'] = getQueryParam('fbclid');
+            const params = {
+                'redirect_key': getQueryParam('redirect_key'),
+                'referrer': document.referrer || 'direct'
+            };
 
-        if (!params.redirect_key) {
-            alert('Error: No destination key specified');
-            return;
-        }
+            // Add tracking parameters to params object (not URL)
+            marketingParams.forEach(param => {
+                const value = getQueryParam(param);
+                if (value) {
+                    params[param] = value;
+                }
+            });
 
-        try {
-            const response = await fetch('redirects.json');
-            const redirects = await response.json();
-            
-            // Find the redirect configuration for this key
-            const redirectConfig = redirects[params.redirect_key];
+            // Handle Google and Facebook click IDs
+            params['gclid'] = getQueryParam('gclid');
+            params['fbclid'] = getQueryParam('fbclid');
 
-            if (!redirectConfig) {
-                alert('Error: Invalid redirect key');
+            if (!params.redirect_key) {
+                alert('Error: No destination key specified');
                 return;
             }
 
-            // Extract key or content field for GA
-            const redirectContent = redirectConfig.content || 'unknown';
-            const redirectKey = params.redirect_key;
+            try {
+                const response = await fetch('redirects.json');
+                const redirects = await response.json();
 
-            // Use the destination URL from the config
-            const finalUrl = new URL(redirectConfig.destination);
+                // Find the redirect configuration for this key
+                const redirectConfig = redirects[params.redirect_key];
 
-            // Add predefined parameters from the config
-            if (redirectConfig.params) {
-                Object.entries(redirectConfig.params).forEach(([key, value]) => {
-                    finalUrl.searchParams.set(key, value);
+                if (!redirectConfig) {
+                    alert('Error: Invalid redirect key');
+                    return;
+                }
+
+                // Extract key or content field for GA
+                const redirectContent = redirectConfig.content || 'unknown';
+                const redirectKey = params.redirect_key;
+
+                // Use the destination URL from the config WITHOUT adding tracking params
+                const finalUrl = redirectConfig.destination;
+
+                // Track the redirect event with all parameters
+                gtag('event', 'redirect', {
+                    'event_category': 'Group Redirect',
+                    'event_label': params.utm_source || 'unknown',
+                    'transport_type': 'beacon',
+                    'redirect_key': redirectKey,
+                    'redirect_content': redirectContent,
+                    ...redirectConfig.params,
+                    ...Object.fromEntries(
+                        Object.entries(params)
+                            .filter(([key]) =>
+                                ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].includes(key)
+                            )
+                    )
                 });
+
+                // Redirect after a short delay to ensure tracking is sent
+                setTimeout(() => {
+                    window.location.href = finalUrl;
+                }, 200);
+            } catch (error) {
+                console.error('Redirect failed:', error);
+                alert('Failed to redirect. Please try again.');
             }
-
-            // Add tracking parameters to the URL
-            Object.entries(params)
-                .filter(([key]) => 
-                    marketingParams.includes(key) || 
-                    ['gclid', 'fbclid'].includes(key)
-                )
-                .forEach(([key, value]) => {
-                    finalUrl.searchParams.set(key, value);
-                });
-
-            // Track the redirect event, including the key or content field
-            gtag('event', 'redirect', {
-                'event_category': 'Group Redirect',
-                'event_label': params.utm_source || 'unknown',
-                'transport_type': 'beacon',
-                'redirect_key': redirectKey,
-                'redirect_content': redirectContent, // Easy to analyze in GA
-                ...redirectConfig.params, // Include all additional parameters
-                ...Object.fromEntries(
-                    Object.entries(params)
-                        .filter(([key]) =>
-                            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].includes(key)
-                        )
-                )
-            });
-
-            // Redirect after a short delay
-            setTimeout(() => {
-                window.location.href = finalUrl.toString();
-            }, 200);
-        } catch (error) {
-            console.error('Redirect failed:', error);
-            alert('Failed to redirect. Please try again.');
         }
-    }
 
-    function getQueryParam(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name)?.trim() || null;
-    }
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name)?.trim() || null;
+        }
 
-    window.addEventListener('load', trackAndRedirect);
-  </script>
+        window.addEventListener('load', trackAndRedirect);
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -136,10 +127,10 @@
 </head>
 
 <body>
-    <div class="loading-container">
-        <h1>Redirecting...</h1>
-        <p>Please wait while we process your request.</p>
-    </div>
+<div class="loading-container">
+    <h1>Redirecting...</h1>
+    <p>Please wait while we process your request.</p>
+</div>
 </body>
 
 </html>
