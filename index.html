@@ -20,90 +20,109 @@
         gtag('config', 'G-385TF6VQ85');
     </script>
 
-    <script>
-        async function trackAndRedirect() {
-            const marketingParams = [
-                'utm_source',
-                'utm_medium',
-                'utm_campaign',
-                'utm_term',
-                'utm_content'
-            ];
 
-            const params = {
-                'redirect_key': getQueryParam('redirect_key'),
-                'referrer': document.referrer || 'direct'
-            };
+<script>
+    // Add this BEFORE your existing tracking function
+    // GA4 Configuration
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'YOUR_GA4_MEASUREMENT_ID'); // Replace with your actual Measurement ID
 
-            // Add tracking parameters to params object (not URL)
-            marketingParams.forEach(param => {
-                const value = getQueryParam(param);
-                if (value) {
-                    params[param] = value;
-                }
-            });
-
-            // Handle Google and Facebook click IDs
-            params['gclid'] = getQueryParam('gclid');
-            params['fbclid'] = getQueryParam('fbclid');
-
-            if (!params.redirect_key) {
-                alert('Error: No destination key specified');
+    async function trackAndRedirect() {
+        const marketingParams = [
+            'utm_source', 'utm_medium', 'utm_campaign', 
+            'utm_term', 'utm_content'
+        ];
+        
+        const params = {
+            'redirect_key': getQueryParam('redirect_key'),
+            'referrer': document.referrer || 'direct'
+        };
+        
+        // Collect marketing parameters
+        marketingParams.forEach(param => {
+            const value = getQueryParam(param);
+            if (value && typeof value === 'string') {
+                params[param] = value.trim();
+            }
+        });
+        
+        // Collect click IDs
+        params['gclid'] = getQueryParam('gclid');
+        params['fbclid'] = getQueryParam('fbclid');
+        
+        if (!params.redirect_key) {
+            console.error('No destination key specified');
+            alert('Error: No destination key specified');
+            return;
+        }
+        
+        try {
+            const response = await fetch('redirects.json');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const redirects = await response.json();
+            const redirectConfig = redirects[params.redirect_key];
+            
+            if (!redirectConfig || !redirectConfig.destination) {
+                console.error('Invalid redirect configuration');
+                alert('Error: Invalid redirect key');
                 return;
             }
+            
+            const redirectContent = redirectConfig.content || 'unknown';
+            const redirectKey = params.redirect_key;
+            const finalUrl = redirectConfig.destination;
 
-            try {
-                const response = await fetch('redirects.json');
-                const redirects = await response.json();
+        // Enhanced Key Event Tracking
+        gtag('event', 'custom_redirect', {
+            'is_key_event': true,
+            'conversion': true,
+            'event_category': 'Group Redirect',
+            'event_label': params.utm_source || 'unknown',
+            'redirect_key': redirectKey,
+            'redirect_content': redirectContent,
+            'redirect_destination': finalUrl,
+            
+            // Include key marketing parameters
+            'utm_source': params.utm_source,
+            'utm_medium': params.utm_medium,
+            'utm_campaign': params.utm_campaign,
+            
+            // Additional click tracking
+            'gclid': params.gclid,
+            'fbclid': params.fbclid
+        });
+           
 
-                // Find the redirect configuration for this key
-                const redirectConfig = redirects[params.redirect_key];
-
-                if (!redirectConfig) {
-                    alert('Error: Invalid redirect key');
-                    return;
-                }
-
-                // Extract key or content field for GA
-                const redirectContent = redirectConfig.content || 'unknown';
-                const redirectKey = params.redirect_key;
-
-                // Use the destination URL from the config WITHOUT adding tracking params
-                const finalUrl = redirectConfig.destination;
-
-                // Track the redirect event with all parameters
-                // gtag('event', 'redirect', {
-                //     'event_category': 'Group Redirect',
-                //     'event_label': params.utm_source || 'unknown',
-                //     'transport_type': 'beacon',
-                //     'redirect_key': redirectKey,
-                //     'redirect_content': redirectContent,
-                //     ...redirectConfig.params,
-                //     ...Object.fromEntries(
-                //         Object.entries(params)
-                //             .filter(([key]) =>
-                //                 ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'].includes(key)
-                //             )
-                //     )
-                // });
-
-                // Redirect after a short delay to ensure tracking is sent
-                setTimeout(() => {
-                    window.location.href = finalUrl;
-                }, 200);
-            } catch (error) {
-                console.error('Redirect failed:', error);
-                alert('Failed to redirect. Please try again.');
-            }
+            
+            // Redirect after tracking
+            setTimeout(() => {
+                window.location.href = finalUrl;
+            }, 200);
+            
+        } catch (error) {
+            console.error('Redirect failed:', error);
+            alert('Failed to redirect. Please try again.');
         }
+    }
+    
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+    
+    window.addEventListener('load', trackAndRedirect);
+</script>
 
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name)?.trim() || null;
-        }
 
-        window.addEventListener('load', trackAndRedirect);
-    </script>
+
+
+
     <style>
         body {
             font-family: Arial, sans-serif;
