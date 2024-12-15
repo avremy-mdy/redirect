@@ -67,7 +67,11 @@
                 alert('Error: Invalid redirect key');
                 return;
             }
-            
+     
+            // Use UTM parameters from the JSON if available
+            const jsonParams = redirectConfig.params || {};
+            Object.assign(params, jsonParams);
+
             const redirectContent = redirectConfig.content || 'unknown';
             const redirectKey = params.redirect_key;
             const finalUrl = redirectConfig.destination;
