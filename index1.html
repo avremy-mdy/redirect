@@ -20,7 +20,15 @@
         gtag('config', 'G-385TF6VQ85');
     </script>
 
+
 <script>
+    // Add this BEFORE your existing tracking function
+    // GA4 Configuration
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'YOUR_GA4_MEASUREMENT_ID'); // Replace with your actual Measurement ID
+
     async function trackAndRedirect() {
         const marketingParams = [
             'utm_source', 'utm_medium', 'utm_campaign', 
@@ -32,7 +40,7 @@
             'referrer': document.referrer || 'direct'
         };
         
-        // Improved: Added validation for parameters
+        // Collect marketing parameters
         marketingParams.forEach(param => {
             const value = getQueryParam(param);
             if (value && typeof value === 'string') {
@@ -40,7 +48,7 @@
             }
         });
         
-        // Additional tracking parameters
+        // Collect click IDs
         params['gclid'] = getQueryParam('gclid');
         params['fbclid'] = getQueryParam('fbclid');
         
@@ -53,7 +61,6 @@
         try {
             const response = await fetch('redirects.json');
             
-            // Added response validity check
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -70,20 +77,30 @@
             const redirectContent = redirectConfig.content || 'unknown';
             const redirectKey = params.redirect_key;
             const finalUrl = redirectConfig.destination;
+
+        // Enhanced Key Event Tracking
+        gtag('event', 'custom_redirect', {
+            'is_key_event': true,
+            'conversion': true,
+            'event_category': 'Group Redirect',
+            'event_label': params.utm_source || 'unknown',
+            'redirect_key': redirectKey,
+            'redirect_content': redirectContent,
+            'redirect_destination': finalUrl,
             
-            // Example of sending event to GA (adjust to your GA implementation)
-            if (window.gtag) {
-                window.gtag('event', 'redirect', {
-                    'event_category': 'Group Redirect',
-                    'event_label': params.utm_source || 'unknown',
-                    'transport_type': 'beacon',
-                    'redirect_key': redirectKey,
-                    'redirect_content': redirectContent,
-                    ...params  // Send all collected parameters
-                });
-            }
+            // Include key marketing parameters
+            'utm_source': params.utm_source,
+            'utm_medium': params.utm_medium,
+            'utm_campaign': params.utm_campaign,
             
-            // Short wait before redirect
+            // Additional click tracking
+            'gclid': params.gclid,
+            'fbclid': params.fbclid
+        });
+           
+
+            
+            // Redirect after tracking
             setTimeout(() => {
                 window.location.href = finalUrl;
             }, 200);
@@ -101,6 +118,8 @@
     
     window.addEventListener('load', trackAndRedirect);
 </script>
+
+
 
 
 
