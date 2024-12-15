@@ -72,7 +72,6 @@
             const jsonParams = redirectConfig.params || {};
             Object.assign(params, jsonParams);
 
-            const redirectContent = redirectConfig.content || 'unknown';
             const redirectKey = params.redirect_key;
             const finalUrl = redirectConfig.destination;
 
@@ -83,7 +82,7 @@
             'event_category': 'Group Redirect',
             'event_label': params.utm_source || 'unknown',
             'redirect_key': redirectKey,
-            'redirect_content': redirectContent,
+            'redirect_content': params.utm_content || 'unknown',
             'redirect_destination': finalUrl,
             
             // Include key marketing parameters
