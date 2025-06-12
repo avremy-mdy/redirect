@@ -201,26 +201,41 @@
                 <div class="form-group">
                     <label for="utmSource">UTM Source</label>
                     <input type="text" id="utmSource" name="utmSource" placeholder="e.g., whatsapp, facebook">
+                    <div class="description">
+                        Traffic source (e.g., whatsapp, facebook, telegram, email)
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="utmMedium">UTM Medium</label>
                     <input type="text" id="utmMedium" name="utmMedium" placeholder="e.g., social, email">
+                    <div class="description">
+                        Marketing medium (e.g., social, email, referral, paid)
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="utmCampaign">UTM Campaign</label>
                     <input type="text" id="utmCampaign" name="utmCampaign" placeholder="e.g., campaign_name">
+                    <div class="description">
+                        Campaign name or identifier (e.g., sanhedrin_2024, spring_promo)
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="utmTerm">UTM Term</label>
-                    <input type="text" id="utmTerm" name="utmTerm" placeholder="e.g., keywords">
+                    <input type="text" id="utmTerm" name="utmTerm" placeholder="campaign team">
+                    <div class="description">
+                        Name of campaign runner i.e. hapargod
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="utmContent">UTM Content</label>
                     <input type="text" id="utmContent" name="utmContent" placeholder="e.g., ad_version">
+                    <div class="description">
+                        Content variation or ad version (e.g., button_red, text_version_a)
+                    </div>
                 </div>
 
                 <div class="button-group">
@@ -252,10 +267,10 @@
                 const redirects = await response.json();
 
                 selectElement.innerHTML = '<option value="" disabled selected>Select a redirect key</option>';
-                Object.entries(redirects).forEach(([key, url]) => {
+                Object.entries(redirects).forEach(([key, config]) => {
                     const option = document.createElement('option');
                     option.value = key;
-                    option.textContent = `${key} (${url})`;
+                    option.textContent = `${key} (${config.destination})`;
                     selectElement.appendChild(option);
                 });
             } catch (error) {
@@ -266,6 +281,10 @@
 
         // Generate the final URL
         function generateUrl() {
+            // Clear previous results
+            document.getElementById('generatedUrl').textContent = '';
+            document.getElementById('actionButtons').style.display = 'none';
+            
             const baseUrl = window.location.origin;
             const redirectKey = document.getElementById('redirectKey').value;
 
@@ -277,10 +296,19 @@
             const params = new URLSearchParams();
             params.append('redirect_key', redirectKey);
 
-            ['utmSource', 'utmMedium', 'utmCampaign', 'utmTerm', 'utmContent'].forEach(param => {
-                const element = document.getElementById(param);
+            // Fixed: Add underscores to UTM parameters
+            const utmFields = [
+                { id: 'utmSource', param: 'utm_source' },
+                { id: 'utmMedium', param: 'utm_medium' },
+                { id: 'utmCampaign', param: 'utm_campaign' },
+                { id: 'utmTerm', param: 'utm_term' },
+                { id: 'utmContent', param: 'utm_content' }
+            ];
+
+            utmFields.forEach(field => {
+                const element = document.getElementById(field.id);
                 if (element && element.value.trim()) {
-                    params.append(param.toLowerCase(), element.value.trim());
+                    params.append(field.param, element.value.trim());
                 }
             });
 
@@ -295,10 +323,27 @@
 
         function copyToClipboard() {
             const urlToCopy = document.getElementById('generatedUrl').textContent;
+            if (!urlToCopy) {
+                alert('No URL to copy! Please generate a URL first.');
+                return;
+            }
+            
             navigator.clipboard.writeText(urlToCopy).then(() => {
                 alert('URL copied to clipboard!');
             }).catch(err => {
                 console.error('Failed to copy:', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = urlToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('URL copied to clipboard!');
+                } catch (err) {
+                    alert('Failed to copy URL');
+                }
+                document.body.removeChild(textArea);
             });
         }
 

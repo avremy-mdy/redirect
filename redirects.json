@@ -1,101 +1,12 @@
 {
   "whatsapp": {
-    "destination":  "https://chat.whatsapp.com/BLX85bS7233Aufg9m0pvXE",
+    "destination": "https://chat.whatsapp.com/BLX85bS7233Aufg9m0pvXE",
     "params": {
       "utm_source": "whatsapp",
       "utm_medium": "social",
       "utm_campaign": "sanhedrin_2024",
-      "utm_content": "whatsapp"
-    }
-  },
-  "cohen": {
-    "destination": "https://chat.whatsapp.com/IOyHe9aQMu73SSqB6a53PP",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "cohen"
-    }
-  },
-  "shuki": {
-    "destination": "https://chat.whatsapp.com/IOyHe9aQMu73SSqB6a53PP",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "shuki"
-    }
-  },
-  "bograd": {
-    "destination": " https://chat.whatsapp.com/Ivw42n5KDX9B83R6USZ7ot",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "bograd"
-    }
-  },
-  "pinchasi": {
-    "destination": "https://chat.whatsapp.com/DaQ0VDdRFmw0mE2uKDqyUd",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "pinchasi"
-    }
-  },
-  "tasa": {
-    "destination": "https://chat.whatsapp.com/JnNoLhUtIkR6BCMGGHTKnf",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "tasa"
-    }
-  },
-  "kepler": {
-    "destination": "https://chat.whatsapp.com/J9v2hW3XFKTKd2myto8hhq",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "kepler"
-    }
-  },
-  "yechiel": {
-    "destination": "https://chat.whatsapp.com/DmOIsNHAWYHEq23r5oPGni",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "yechiel"
-    }
-  },
-  "hoffman": {
-    "destination": "https://chat.whatsapp.com/CtYAi6zxV5iAgBXLapTD2L",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "hoffman"
-    }
-  },
-  "stcity": {
-    "destination": " https://chat.whatsapp.com/IP4dBsXvPLS8OdEbiPoai6",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "stcity"
-    }
-  },
-  "st2": {
-    "destination": "https://chat.whatsapp.com/GUpTdxOoU0409g41U6KJbo",
-    "params": {
-      "utm_source": "whatsapp",
-      "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
-      "utm_content": "st2"
+      "utm_content": "whatsapp",
+      "utm_term": "default_link"
     }
   }
 }

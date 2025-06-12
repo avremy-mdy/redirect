@@ -20,9 +20,7 @@
         gtag('config', 'G-385TF6VQ85');
     </script>
 
-
 <script>
-
     async function trackAndRedirect() {
         const marketingParams = [
             'utm_source', 'utm_medium', 'utm_campaign', 
@@ -34,7 +32,7 @@
             'referrer': document.referrer || 'direct'
         };
         
-        // Collect marketing parameters
+        // Collect marketing parameters from URL
         marketingParams.forEach(param => {
             const value = getQueryParam(param);
             if (value && typeof value === 'string') {
@@ -68,42 +66,70 @@
                 return;
             }
      
-            // Use UTM parameters from the JSON if available
+            // FIXED: Use JSON params as fallback, URL params override them
             const jsonParams = redirectConfig.params || {};
-            Object.assign(params, jsonParams);
+            
+            // Create final params with JSON as defaults, URL params override
+            const finalParams = {};
+            
+            // Start with JSON defaults
+            Object.assign(finalParams, jsonParams);
+            
+            // Override with URL params where they exist
+            marketingParams.forEach(param => {
+                if (params[param]) {
+                    finalParams[param] = params[param];
+                }
+            });
+            
+            // Always include these from URL params
+            finalParams.redirect_key = params.redirect_key;
+            finalParams.referrer = params.referrer;
+            if (params.gclid) finalParams.gclid = params.gclid;
+            if (params.fbclid) finalParams.fbclid = params.fbclid;
 
-            const redirectKey = params.redirect_key;
+            const redirectKey = finalParams.redirect_key;
             const finalUrl = redirectConfig.destination;
 
-        // Enhanced Key Event Tracking
-        gtag('event', 'custom_redirect', {
-            'is_key_event': true,
-            'conversion': true,
-            'event_category': 'Group Redirect',
-            'event_label': params.utm_source || 'unknown',
-            'redirect_key': redirectKey,
-            'redirect_content': params.utm_content || 'unknown',
-            'redirect_destination': finalUrl,
+            // Debug logging
+            console.log('Final params being sent to GA:', finalParams);
+            console.log('utm_term value:', finalParams.utm_term);
             
-            // Include key marketing parameters
-            'utm_source': params.utm_source,
-            'utm_medium': params.utm_medium,
-            'utm_campaign': params.utm_campaign,
-	    'utm_content': params.utm_content,
-	    'utm_term': params.utm_term,
-	    
-            
-            // Additional click tracking
-            'gclid': params.gclid,
-            'fbclid': params.fbclid
-        });
-           
-
+            // Enhanced Key Event Tracking with final merged params
+            console.log('Firing custom_redirect event...');
+            gtag('event', 'custom_redirect', {
+                'is_key_event': true,
+                'conversion': true,
+                'event_category': 'Group Redirect',
+                'event_label': finalParams.utm_source || 'unknown',
+                'redirect_key': redirectKey,
+                'redirect_content': finalParams.utm_content || 'unknown',
+                'redirect_destination': finalUrl,
+                
+                // Include key marketing parameters (URL params override JSON)
+                'utm_source': finalParams.utm_source,
+                'utm_medium': finalParams.utm_medium,
+                'utm_campaign': finalParams.utm_campaign,
+                'utm_content': finalParams.utm_content,
+                'utm_term': finalParams.utm_term,
+                
+                // Additional click tracking
+                'gclid': finalParams.gclid,
+                'fbclid': finalParams.fbclid,
+                
+                // Debug info to verify override behavior
+                'param_source': JSON.stringify({
+                    url_params: params,
+                    json_params: jsonParams,
+                    final_params: finalParams
+                })
+            });
             
             // Redirect after tracking
             setTimeout(() => {
+                console.log('Redirecting to:', finalUrl);
                 window.location.href = finalUrl;
-            }, 200);
+            }, 1000); // Increased delay to ensure GA tracking completes
             
         } catch (error) {
             console.error('Redirect failed:', error);
@@ -118,10 +144,6 @@
     
     window.addEventListener('load', trackAndRedirect);
 </script>
-
-
-
-
 
     <style>
         body {
