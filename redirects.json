@@ -4,7 +4,17 @@
     "params": {
       "utm_source": "whatsapp",
       "utm_medium": "social",
-      "utm_campaign": "sanhedrin_2024",
+      "utm_campaign": "avoda_zarah_2025",
+      "utm_content": "whatsapp",
+      "utm_term": "default_link"
+    }
+  },
+  "hebrew-gemara": {
+    "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfEfcFbarFdFNpTOxnyks0EYBxc07fMTTDow1uKN3dswiUgtA/viewform",
+    "params": {
+      "utm_source": "whatsapp",
+      "utm_medium": "social",
+      "utm_campaign": "avoda_zarah_2025",
       "utm_content": "whatsapp",
       "utm_term": "default_link"
     }
