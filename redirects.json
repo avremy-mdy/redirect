@@ -9,6 +9,16 @@
       "utm_term": "default_link"
     }
   },
+  "hapargod-whatsapp": {
+    "destination": "https://chat.whatsapp.com/BLX85bS7233Aufg9m0pvXE",
+    "params": {
+      "utm_source": "whatsapp",
+      "utm_medium": "social",
+      "utm_campaign": "avoda_zarah_2025",
+      "utm_content": "whatsapp",
+      "utm_term": "hapargod"
+    }
+  },
   "hebrew-gemara": {
     "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfEfcFbarFdFNpTOxnyks0EYBxc07fMTTDow1uKN3dswiUgtA/viewform",
     "params": {
@@ -16,6 +26,16 @@
       "utm_medium": "social",
       "utm_campaign": "avoda_zarah_2025",
       "utm_content": "whatsapp",
+      "utm_term": "default_link"
+    }
+  },
+  "hapargod-gemara": {
+    "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfEfcFbarFdFNpTOxnyks0EYBxc07fMTTDow1uKN3dswiUgtA/viewform",
+    "params": {
+      "utm_source": "whatsapp",
+      "utm_medium": "social",
+      "utm_campaign": "avoda_zarah_2025",
+      "utm_content": "hapargod",
       "utm_term": "default_link"
     }
   }
