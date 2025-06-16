@@ -88,6 +88,13 @@
             if (params.gclid) finalParams.gclid = params.gclid;
             if (params.fbclid) finalParams.fbclid = params.fbclid;
 
+            // Validate required utm_term parameter
+            if (!finalParams.utm_term || finalParams.utm_term.trim() === '') {
+                console.error('Error: utm_term parameter is required but missing or empty');
+                alert('Error: utm_term parameter is required but missing or empty');
+                return;
+            }
+
             const redirectKey = finalParams.redirect_key;
             const finalUrl = redirectConfig.destination;
 
@@ -111,7 +118,7 @@
                 'utm_medium': finalParams.utm_medium,
                 'utm_campaign': finalParams.utm_campaign,
                 'utm_content': finalParams.utm_content,
-                'utm_term': finalParams.utm_term,
+                    'utm_term': finalParams.utm_term,
                 
                 // Additional click tracking
                 'gclid': finalParams.gclid,
