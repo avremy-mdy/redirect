@@ -19,6 +19,16 @@
       "utm_term": "hapargod"
     }
   },
+  "telechofesh-whatsapp": {
+    "destination": "https://chat.whatsapp.com/E1dHXs8kA4fCfTKiJq2JLs",
+    "params": {
+      "utm_source": "magazine",
+      "utm_medium": "social",
+      "utm_campaign": "avoda_zarah_2025",
+      "utm_content": "whatsapp",
+      "utm_term": "telechofesh"
+    }
+  },
   "hebrew-gemara": {
     "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfEfcFbarFdFNpTOxnyks0EYBxc07fMTTDow1uKN3dswiUgtA/viewform",
     "params": {
