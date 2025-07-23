@@ -7,6 +7,7 @@
     <title>MDY Redirect URL Builder</title>
     <link rel="icon" href="https://cdn.prod.website-files.com/638d1e939a16180ba7bca49d/63a06bd829e4ac63dd2358ed_MDYIcon.png" type="image/png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --primary-color: #007bff;
@@ -115,6 +116,14 @@
             font-family: monospace;
             max-height: 150px;
             overflow-y: auto;
+            min-height: 60px;
+            cursor: text;
+        }
+
+        #generatedUrl[contenteditable="true"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
         }
 
         .button-group {
@@ -166,11 +175,58 @@
             margin-right: 10px;
         }
 
+        .url-display {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .url-section {
+            flex: 1;
+        }
+
+        .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #qrcode {
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 10px;
+            background-color: white;
+        }
+
+        .qr-download-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .qr-download-btn:hover {
+            background-color: #218838;
+        }
+
         @media (max-width: 600px) {
             .button-group {
                 flex-direction: column;
             }
             .btn {
+                width: 100%;
+            }
+            .url-display {
+                flex-direction: column;
+                align-items: center;
+            }
+            .url-section {
                 width: 100%;
             }
         }
@@ -244,15 +300,24 @@
                     </button>
                 </div>
 
-                <div id="generatedUrl"></div>
-
-                <div class="button-group" id="actionButtons" style="display: none;">
-                    <a href="#" id="followLink" class="btn btn-primary" target="_blank">
-                        <i class="fas fa-external-link-alt"></i> Follow Link
-                    </a>
-                    <button type="button" onclick="copyToClipboard()" class="btn btn-secondary">
-                        <i class="fas fa-copy"></i> Copy URL
-                    </button>
+                <div class="url-display" id="urlDisplay" style="display: none;">
+                    <div class="url-section">
+                        <div id="generatedUrl"></div>
+                        <div class="button-group">
+                            <a href="#" id="followLink" class="btn btn-primary" target="_blank">
+                                <i class="fas fa-external-link-alt"></i> Follow Link
+                            </a>
+                            <button type="button" onclick="copyToClipboard()" class="btn btn-secondary">
+                                <i class="fas fa-copy"></i> Copy URL
+                            </button>
+                        </div>
+                    </div>
+                    <div class="qr-section">
+                        <div id="qrcode"></div>
+                        <button onclick="downloadQRCode()" class="qr-download-btn">
+                            <i class="fas fa-download"></i> Download QR
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -283,7 +348,8 @@
         function generateUrl() {
             // Clear previous results
             document.getElementById('generatedUrl').textContent = '';
-            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('urlDisplay').style.display = 'none';
+            document.getElementById('qrcode').innerHTML = '';
             
             const baseUrl = window.location.origin;
             const redirectKey = document.getElementById('redirectKey').value;
@@ -315,10 +381,12 @@
             const fullUrl = `${baseUrl}?${params.toString()}`;
             document.getElementById('generatedUrl').textContent = fullUrl;
 
-            const actionButtons = document.getElementById('actionButtons');
-            actionButtons.style.display = 'flex';
-
+            // Show the URL display container
+            document.getElementById('urlDisplay').style.display = 'flex';
             document.getElementById('followLink').href = fullUrl;
+
+            // Generate QR code
+            generateQRCode(fullUrl);
         }
 
         function copyToClipboard() {
@@ -345,6 +413,43 @@
                 }
                 document.body.removeChild(textArea);
             });
+        }
+
+        // Generate QR Code
+        function generateQRCode(url) {
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = '';
+            
+            try {
+                new QRCode(qrcodeContainer, {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#000000',
+                    colorLight: '#FFFFFF',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (error) {
+                console.error('QR Code generation error:', error);
+                qrcodeContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Failed to generate QR code</div>';
+            }
+        }
+
+        // Download QR Code
+        function downloadQRCode() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (!canvas) {
+                alert('No QR code available to download!');
+                return;
+            }
+            
+            // Create a temporary link element for download
+            const link = document.createElement('a');
+            link.download = 'qr-code.png';
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         // Initialize dropdown on page load
