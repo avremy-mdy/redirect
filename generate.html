@@ -302,13 +302,16 @@
 
                 <div class="url-display" id="urlDisplay" style="display: none;">
                     <div class="url-section">
-                        <div id="generatedUrl"></div>
+                        <div id="generatedUrl" contenteditable="true" placeholder="Edit URL or generate one above..."></div>
                         <div class="button-group">
                             <a href="#" id="followLink" class="btn btn-primary" target="_blank">
                                 <i class="fas fa-external-link-alt"></i> Follow Link
                             </a>
                             <button type="button" onclick="copyToClipboard()" class="btn btn-secondary">
                                 <i class="fas fa-copy"></i> Copy URL
+                            </button>
+                            <button type="button" onclick="updateQRCode()" class="btn btn-secondary">
+                                <i class="fas fa-qrcode"></i> Update QR
                             </button>
                         </div>
                     </div>
@@ -390,7 +393,7 @@
         }
 
         function copyToClipboard() {
-            const urlToCopy = document.getElementById('generatedUrl').textContent;
+            const urlToCopy = document.getElementById('generatedUrl').textContent.trim();
             if (!urlToCopy) {
                 alert('No URL to copy! Please generate a URL first.');
                 return;
@@ -413,6 +416,21 @@
                 }
                 document.body.removeChild(textArea);
             });
+        }
+
+        // Update QR Code based on current URL text
+        function updateQRCode() {
+            const currentUrl = document.getElementById('generatedUrl').textContent.trim();
+            if (!currentUrl) {
+                alert('No URL to generate QR code for!');
+                return;
+            }
+            
+            // Update the follow link as well
+            document.getElementById('followLink').href = currentUrl;
+            
+            // Generate new QR code
+            generateQRCode(currentUrl);
         }
 
         // Generate QR Code
