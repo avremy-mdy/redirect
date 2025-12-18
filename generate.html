@@ -7,7 +7,8 @@
     <title>MDY Redirect URL Builder</title>
     <link rel="icon" href="https://cdn.prod.website-files.com/638d1e939a16180ba7bca49d/63a06bd829e4ac63dd2358ed_MDYIcon.png" type="image/png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     <style>
         :root {
             --primary-color: #007bff;
@@ -433,24 +434,86 @@
             generateQRCode(currentUrl);
         }
 
-        // Generate QR Code
+        // Generate QR Code with logo overlay
         function generateQRCode(url) {
             const qrcodeContainer = document.getElementById('qrcode');
             qrcodeContainer.innerHTML = '';
             
             try {
-                new QRCode(qrcodeContainer, {
-                    text: url,
-                    width: 200,
-                    height: 200,
-                    colorDark: '#000000',
-                    colorLight: '#FFFFFF',
-                    correctLevel: QRCode.CorrectLevel.M
+                // Create canvas for QR code
+                const canvas = document.createElement('canvas');
+                canvas.width = 200;
+                canvas.height = 200;
+                qrcodeContainer.appendChild(canvas);
+                
+                // Generate QR code using QRious
+                const qr = new QRious({
+                    element: canvas,
+                    value: url,
+                    size: 200,
+                    background: '#FFFFFF',
+                    foreground: '#000000',
+                    level: 'H' // High error correction for logo overlay
                 });
+                
+                // Add logo overlay
+                setTimeout(() => {
+                    addLogoToQR(canvas);
+                }, 50);
+                
             } catch (error) {
                 console.error('QR Code generation error:', error);
                 qrcodeContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Failed to generate QR code</div>';
             }
+        }
+        
+        // Add logo overlay to QR code
+        function addLogoToQR(canvas) {
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                const logoSize = 40; // Logo size
+                const padding = 6; // White space around logo
+                const borderWidth = 2; // Border thickness
+                const totalSize = logoSize + (padding * 2) + (borderWidth * 2);
+                
+                const x = (canvas.width - logoSize) / 2;
+                const y = (canvas.height - logoSize) / 2;
+                const bgX = (canvas.width - (logoSize + padding * 2)) / 2;
+                const bgY = (canvas.height - (logoSize + padding * 2)) / 2;
+                const borderX = (canvas.width - totalSize) / 2;
+                const borderY = (canvas.height - totalSize) / 2;
+                
+                // Draw outer border (subtle gray)
+                ctx.fillStyle = '#E0E0E0';
+                ctx.fillRect(borderX, borderY, totalSize, totalSize);
+                
+                // Draw white background square inside border
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(bgX, bgY, logoSize + (padding * 2), logoSize + (padding * 2));
+                
+                // Add subtle shadow effect
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+                ctx.shadowBlur = 3;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+                
+                // Draw logo
+                ctx.drawImage(img, x, y, logoSize, logoSize);
+                
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+            };
+            
+            img.onerror = function() {
+                console.warn('Could not load logo: images/mdy_bw.png');
+            };
+            
+            img.src = 'images/mdy_bw.png';
         }
 
         // Download QR Code
@@ -461,9 +524,9 @@
                 return;
             }
             
-            // Create a temporary link element for download
+            // Create download link
             const link = document.createElement('a');
-            link.download = 'qr-code.png';
+            link.download = 'qr-code-with-logo.png';
             link.href = canvas.toDataURL('image/png');
             document.body.appendChild(link);
             link.click();
