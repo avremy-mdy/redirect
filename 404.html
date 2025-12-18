@@ -33,7 +33,7 @@
             'redirect_key': pathKey || getQueryParam('redirect_key'),
             'referrer': document.referrer || 'direct'
         };
-        
+
         // Collect marketing parameters from URL
         marketingParams.forEach(param => {
             const value = getQueryParam(param);
@@ -41,50 +41,50 @@
                 params[param] = value.trim();
             }
         });
-        
+
         // Collect click IDs
         params['gclid'] = getQueryParam('gclid');
         params['fbclid'] = getQueryParam('fbclid');
-        
+
         if (!params.redirect_key) {
             console.error('No destination key specified');
             alert('Error: No destination key specified');
             return;
         }
-        
+
         try {
-            // Use absolute path to ensure it works from any URL path
+            // Use absolute path since 404.html can be served from any URL path
             const response = await fetch('/redirects.json');
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const redirects = await response.json();
             const redirectConfig = redirects[params.redirect_key];
-            
+
             if (!redirectConfig || !redirectConfig.destination) {
                 console.error('Invalid redirect configuration');
                 alert('Error: Invalid redirect key');
                 return;
             }
-     
+
             // FIXED: Use JSON params as fallback, URL params override them
             const jsonParams = redirectConfig.params || {};
-            
+
             // Create final params with JSON as defaults, URL params override
             const finalParams = {};
-            
+
             // Start with JSON defaults
             Object.assign(finalParams, jsonParams);
-            
+
             // Override with URL params where they exist
             marketingParams.forEach(param => {
                 if (params[param]) {
                     finalParams[param] = params[param];
                 }
             });
-            
+
             // Always include these from URL params
             finalParams.redirect_key = params.redirect_key;
             finalParams.referrer = params.referrer;
@@ -104,7 +104,7 @@
             // Debug logging
             console.log('Final params being sent to GA:', finalParams);
             console.log('utm_term value:', finalParams.utm_term);
-            
+
             // Enhanced Key Event Tracking with final merged params
             console.log('Firing custom_redirect event...');
             gtag('event', 'custom_redirect', {
@@ -115,18 +115,18 @@
                 'redirect_key': redirectKey,
                 'redirect_content': finalParams.utm_content || 'unknown',
                 'redirect_destination': finalUrl,
-                
+
                 // Include key marketing parameters (URL params override JSON)
                 'utm_source': finalParams.utm_source,
                 'utm_medium': finalParams.utm_medium,
                 'utm_campaign': finalParams.utm_campaign,
                 'utm_content': finalParams.utm_content,
                     'utm_term': finalParams.utm_term,
-                
+
                 // Additional click tracking
                 'gclid': finalParams.gclid,
                 'fbclid': finalParams.fbclid,
-                
+
                 // Debug info to verify override behavior
                 'param_source': JSON.stringify({
                     url_params: params,
@@ -134,19 +134,19 @@
                     final_params: finalParams
                 })
             });
-            
+
             // Redirect after tracking
             setTimeout(() => {
                 console.log('Redirecting to:', finalUrl);
                 window.location.href = finalUrl;
             }, 1000); // Increased delay to ensure GA tracking completes
-            
+
         } catch (error) {
             console.error('Redirect failed:', error);
             alert('Failed to redirect. Please try again.');
         }
     }
-    
+
     function getQueryParam(name) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(name);
