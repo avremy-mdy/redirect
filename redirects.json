@@ -48,5 +48,15 @@
       "utm_content": "hapargod",
       "utm_term": "hapargod"
     }
+  },
+  "toker": {
+    "destination": "https://chat.whatsapp.com/KRnWUt9Lt2E4sweuveJlFb",
+    "params": {
+      "utm_source": "whatsapp",
+      "utm_medium": "social",
+      "utm_campaign": "menachos_2026",
+      "utm_content": "toker",
+      "utm_term": "toker"
+    }
   }
 }
