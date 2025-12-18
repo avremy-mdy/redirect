@@ -354,7 +354,7 @@
             document.getElementById('generatedUrl').textContent = '';
             document.getElementById('urlDisplay').style.display = 'none';
             document.getElementById('qrcode').innerHTML = '';
-            
+
             const baseUrl = window.location.origin;
             const redirectKey = document.getElementById('redirectKey').value;
 
@@ -363,10 +363,8 @@
                 return;
             }
 
+            // Build UTM params if any are provided
             const params = new URLSearchParams();
-            params.append('redirect_key', redirectKey);
-
-            // Fixed: Add underscores to UTM parameters
             const utmFields = [
                 { id: 'utmSource', param: 'utm_source' },
                 { id: 'utmMedium', param: 'utm_medium' },
@@ -382,7 +380,11 @@
                 }
             });
 
-            const fullUrl = `${baseUrl}?${params.toString()}`;
+            // Use path-based URL format: domain.com/redirectKey
+            const queryString = params.toString();
+            const fullUrl = queryString
+                ? `${baseUrl}/${redirectKey}?${queryString}`
+                : `${baseUrl}/${redirectKey}`;
             document.getElementById('generatedUrl').textContent = fullUrl;
 
             // Show the URL display container
