@@ -58,5 +58,15 @@
       "utm_content": "toker",
       "utm_term": "toker"
     }
+  },
+  "zevachim": {
+    "destination": "https://chat.whatsapp.com/J2ybytTEg0wE4JAdDfj7hd",
+    "params": {
+      "utm_source": "whatsapp",
+      "utm_medium": "social",
+      "utm_campaign": "zevachim_2026",
+      "utm_content": "zevachim",
+      "utm_term": "zevachim"
+    }
   }
 }
