@@ -1,10 +1,20 @@
 {
   "whatsapp-hebrew": {
-    "destination": "https://chat.whatsapp.com/E1dHXs8kA4fCfTKiJq2JLs",
+    "destination": "https://chat.whatsapp.com/J2ybytTEg0wE4JAdDfj7hd",
     "params": {
       "utm_source": "whatsapp",
       "utm_medium": "social",
-      "utm_campaign": "avoda_zarah_2025",
+      "utm_campaign": "bechoros_2026",
+      "utm_content": "whatsapp",
+      "utm_term": "default_link"
+    }
+  },
+  "whatsapp-english": {
+    "destination": "https://chat.whatsapp.com/J2ybytTEg0wE4JAdDfj7hd",
+    "params": {
+      "utm_source": "whatsapp",
+      "utm_medium": "social",
+      "utm_campaign": "bechoros_2026",
       "utm_content": "whatsapp",
       "utm_term": "default_link"
     }
