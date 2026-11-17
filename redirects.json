@@ -78,5 +78,15 @@
       "utm_content": "zevachim",
       "utm_term": "zevachim"
     }
+  },
+  "arachin": {
+    "destination": "https://chat.whatsapp.com/K2JrOIIfMkGECJaL5SIGKX",
+    "params": {
+      "utm_source": "whatsapp",
+      "utm_medium": "social",
+      "utm_campaign": "arachin_2026",
+      "utm_content": "arachin",
+      "utm_term": "arachin"
+    }
   }
 }
